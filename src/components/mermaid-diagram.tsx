@@ -3,7 +3,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import DOMPurify from "dompurify";
 import mermaid from "mermaid";
-import { useTheme } from "next-themes";
 
 import { MermaidDiagramToolbar } from "~/components/mermaid-diagram-toolbar";
 import {
@@ -15,7 +14,6 @@ import {
   sanitizeMermaidSourceForRender,
 } from "~/features/diagram/mermaid-security";
 import { useMermaidViewport } from "~/hooks/use-mermaid-viewport";
-import { cn } from "~/lib/utils";
 
 interface MermaidChartProps {
   chart: string;
@@ -49,8 +47,6 @@ const MermaidChart = ({
   const reportedRenderErrorRef = useRef<string | null>(null);
   const [renderMessage, setRenderMessage] = useState<string | null>(null);
   const [renderVersion, setRenderVersion] = useState(0);
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const fitPadding = zoomingEnabled
     ? INTERACTIVE_FIT_PADDING
     : fitToContainer
@@ -92,13 +88,13 @@ const MermaidChart = ({
     const baseConfig = {
       startOnLoad: false,
       suppressErrorRendering: true,
-      securityLevel: "antiscript" as const,
+      securityLevel: "strict" as const,
       secure: ["securityLevel", "startOnLoad", "maxTextSize"],
       theme: "base" as const,
       // Pure SVG labels survive strict sanitization without relying on
       // foreignObject HTML, which is both harder to secure and less portable.
       htmlLabels: false,
-      layout: "elk",
+      layout: "dagre",
       // Mermaid 12 defaults to the "neo" look and a 120px wrap, which splits
       // file paths mid-name; keep the classic look and the old 200px wrap.
       look: "classic" as const,
@@ -109,50 +105,16 @@ const MermaidChart = ({
         rankSpacing: 50,
         padding: 15,
       },
-      themeVariables: isDark
-        ? {
-            background: backgroundColor ?? "#1f2631",
-            primaryColor: "#2c3544",
-            primaryBorderColor: "#6dd4e9",
-            primaryTextColor: "#e8edf5",
-            lineColor: "#ffd486",
-            secondaryColor: "#26303f",
-            tertiaryColor: "#323d4d",
-          }
-        : {
-            background: backgroundColor ?? "#ffffff",
-            primaryColor: "#f7f7f7",
-            primaryBorderColor: "#000000",
-            primaryTextColor: "#171717",
-            lineColor: "#000000",
-            secondaryColor: "#f0f0f0",
-            tertiaryColor: "#f7f7f7",
-          },
-      themeCSS: `
-        .clickable > * {
-          scale: 1;
-          transform-box: fill-box;
-          transform-origin: center;
-          transition: scale 160ms cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .clickable {
-          cursor: pointer;
-        }
-        @media (hover: hover) and (pointer: fine) {
-          .clickable:hover > * {
-            scale: 1.05;
-            filter: brightness(0.85);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .clickable > * {
-            transition: none;
-          }
-          .clickable:hover > * {
-            scale: 1;
-          }
-        }
-      `,
+      themeVariables: {
+        background: backgroundColor ?? "#ffffff",
+        primaryColor: "#f7f7f7",
+        primaryBorderColor: "#334155",
+        primaryTextColor: "#171717",
+        lineColor: "#64748b",
+        secondaryColor: "#f0f0f0",
+        tertiaryColor: "#f7f7f7",
+      },
+
     };
 
     const renderDiagram = async () => {
@@ -174,18 +136,19 @@ const MermaidChart = ({
       try {
         const renderId = `gitdiagram-${Math.random().toString(36).slice(2)}`;
         const safeChart = sanitizeMermaidSourceForRender(chart);
-        const { svg, bindFunctions } = await withDomNodesSerializingSafely(() =>
+        const { svg } = await withDomNodesSerializingSafely(() =>
           mermaid.render(renderId, safeChart, renderTarget),
         );
         if (cancelled) return;
 
-        mermaidElement.textContent = "";
-        mermaidElement.innerHTML = DOMPurify.sanitize(svg, {
-          USE_PROFILES: { html: true, svg: true, svgFilters: true },
-          FORBID_TAGS: ["script"],
+        const sanitized = document.createElement("div");
+        sanitized.innerHTML = DOMPurify.sanitize(svg, {
+          USE_PROFILES: { svg: true, svgFilters: true },
+          FORBID_TAGS: ["script", "foreignObject", "image", "a", "iframe", "animate", "set"],
+          FORBID_ATTR: ["href", "xlink:href"],
         });
-        enforceSafeMermaidLinks(mermaidElement);
-        bindFunctions?.(mermaidElement);
+        enforceSafeMermaidLinks(sanitized);
+        mermaidElement.replaceChildren(...Array.from(sanitized.childNodes));
         setRenderVersion((currentVersion) => currentVersion + 1);
       } catch (error) {
         if (cancelled) return;
@@ -217,64 +180,22 @@ const MermaidChart = ({
     containerRef,
     diagramRef,
     disconnectResizeObserver,
-    isDark,
     prepareForRender,
   ]);
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "w-full p-4",
-        zoomingEnabled && "h-[70vh] max-h-[52rem] min-h-[22rem]",
-        containerClassName,
-      )}
-    >
-      {renderMessage && (
-        <div className="mb-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
-          {renderMessage}
-        </div>
-      )}
-      <div
-        ref={interactionLayerRef}
+    <div ref={containerRef} className={`diagram-shell ${containerClassName ?? ""}`}>
+      {renderMessage && <p role="alert" className="error">{renderMessage}</p>}
+      <div ref={interactionLayerRef}
         {...(zoomingEnabled ? INTERACTIVE_VIEWER_PROPS : {})}
-        onKeyDown={handleKeyDown}
-        className={cn(
-          "relative h-full",
-          zoomingEnabled
-            ? "touch-none"
-            : "touch-pan-x touch-pan-y touch-pinch-zoom",
-          (zoomingEnabled || fitToContainer) && "overflow-hidden",
-          zoomingEnabled &&
-            "cursor-grab rounded-xl border border-black/12 bg-white/30 select-none data-[dragging=true]:cursor-grabbing dark:border-white/12 dark:bg-white/[0.03] [&_*]:select-none",
-        )}
-        onClickCapture={handleClickCapture}
-        onDragStart={handleDragStart}
-        onLostPointerCapture={handleLostPointerCapture}
-        onPointerCancel={handlePointerCancel}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-      >
-        {zoomingEnabled && (
-          <MermaidDiagramToolbar
-            formattedZoom={formattedZoom}
-            isPanZoomReady={isPanZoomReady}
-            onFit={() => fitDiagram(true)}
-            onZoomIn={() => stepZoom(1.18)}
-            onZoomOut={() => stepZoom(1 / 1.18)}
-          />
-        )}
-        <div
-          ref={diagramRef}
-          className={cn(
-            "mermaid text-foreground [&_svg]:mx-auto [&_svg]:block [&_svg]:max-w-full [&_svg]:overflow-visible",
-            !isPanZoomReady && "invisible",
-            zoomingEnabled && "[&_svg]:h-auto [&_svg]:w-auto",
-            !zoomingEnabled && "[&_svg]:h-auto",
-            diagramClassName,
-          )}
-        />
+        onKeyDown={handleKeyDown} className="diagram-interaction"
+        onClickCapture={handleClickCapture} onDragStart={handleDragStart}
+        onLostPointerCapture={handleLostPointerCapture} onPointerCancel={handlePointerCancel}
+        onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
+        {zoomingEnabled && <MermaidDiagramToolbar formattedZoom={formattedZoom}
+          isPanZoomReady={isPanZoomReady} onFit={() => fitDiagram(true)}
+          onZoomIn={() => stepZoom(1.18)} onZoomOut={() => stepZoom(1 / 1.18)} />}
+        <div ref={diagramRef} className={`mermaid ${!isPanZoomReady ? "pending" : ""} ${diagramClassName ?? ""}`} />
       </div>
     </div>
   );

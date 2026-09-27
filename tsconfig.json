@@ -1,52 +1,23 @@
 {
   "compilerOptions": {
-    /* Base Options: */
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
-    /* Strictness */
+    "checkJs": false,
+    "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "checkJs": true,
-    /* Bundled projects */
-    "lib": ["dom", "dom.iterable", "ES2022"],
     "noEmit": true,
+    "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "jsx": "react-jsx",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "incremental": true,
-    "types": ["node"],
-    /* Path Aliases */
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "plugins": [{ "name": "next" }],
+    "paths": { "~/*": ["./src/*"] }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.cjs",
-    "**/*.js",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    ".agents",
-    ".claude",
-    ".playwright-mcp",
-    "experiments",
-    "public/video-engine",
-    "workers",
-    "**/__pycache__"
-  ]
+  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

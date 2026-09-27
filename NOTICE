@@ -1,0 +1,14 @@
+GitDiagram Local is a modified fork of GitDiagram:
+https://github.com/ahmedkhaleel2004/gitdiagram
+
+Original copyright: Copyright (c) 2024 Ahmed Khaleel.
+The original MIT license and notice are preserved in LICENSE.
+
+This fork changes the application into a self-hosted, browser-only report viewer.
+It removes the original cloud generation, credential, telemetry, presence,
+advertising and video functionality. These modifications do not imply endorsement
+by the original author.
+
+Third-party packages and assets retain their respective licenses and notices.
+The project's MIT license does not establish that every dependency is MIT-licensed.
+Review and preserve applicable third-party notices when distributing a build.

@@ -1,3 +1,7 @@
+> **Local fork note:** GitDiagram is the original work of **Ahmed Khaleel**. His original README is preserved below. This fork removes the hosted generation, tracking, presence, cloud storage and video integrations, and imports architecture reports prepared with the owner's chosen tools. These changes are not endorsed by the original author.
+>
+> For this fork's current usage and setup, see [README.local.md](README.local.md). The upstream features and installation instructions below describe the original project. The original [MIT license](LICENSE) and copyright notice are preserved.
+
 # GitDiagram
 
 Turn any public or private GitHub repository into an interactive architecture diagram, or watch it explained in a one-minute narrated video.

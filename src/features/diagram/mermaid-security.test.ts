@@ -1,81 +1,32 @@
 import { describe, expect, it } from "vitest";
-
-import {
-  enforceSafeMermaidLinks,
-  sanitizeMermaidSourceForRender,
-} from "~/features/diagram/mermaid-security";
-
-describe("sanitizeMermaidSourceForRender", () => {
-  it("removes config directives and unsafe callbacks while preserving generated GitHub links", () => {
-    const source = [
-      "%%{init:",
-      "  {'securityLevel': 'loose'}",
-      "}%%",
-      "flowchart TD",
-      'click node_safe "https://github.com/acme/demo/blob/main/src/a.ts"',
-      'click CORE "https://github.com/FastAPI/FastAPI/blob/master/fastapi/applications.py"',
-      "click node_bad call alert()",
-      'click node_bad "javascript:alert(1)"',
-    ].join("\n");
-
-    expect(sanitizeMermaidSourceForRender(source)).toBe(
-      [
-        "flowchart TD",
-        'click node_safe "https://github.com/acme/demo/blob/main/src/a.ts"',
-        'click CORE "https://github.com/FastAPI/FastAPI/blob/master/fastapi/applications.py"',
-      ].join("\n"),
-    );
-  });
-
-  it("removes click directives that use non-space whitespace after the keyword", () => {
-    const source = [
-      "flowchart TD",
-      'click\tnode_a "https://evil.example.com/x"',
-    ].join("\n");
-
-    expect(sanitizeMermaidSourceForRender(source)).toBe("flowchart TD");
-  });
-
-  it("removes a bare click line that continues onto the next line", () => {
-    // Mermaid's lexer treats the newline after "click" as whitespace, so the
-    // directive spans two lines; dropping the bare "click" line breaks it.
-    const source = [
-      "flowchart TD",
-      "click",
-      'node_a "https://evil.example.com/x"',
-    ].join("\n");
-
-    expect(sanitizeMermaidSourceForRender(source)).toBe(
-      ["flowchart TD", 'node_a "https://evil.example.com/x"'].join("\n"),
-    );
-  });
-
-  it("preserves canonical compiler click output unchanged", () => {
-    const source = [
-      "flowchart TD",
-      'click node_safe "https://github.com/acme/demo/blob/main/src/a.ts"',
-    ].join("\n");
-
+import { compileDiagramGraph } from "~/features/report/graph";
+import { SAMPLE_REPORT } from "~/features/report/prompt";
+import { enforceSafeMermaidLinks, sanitizeMermaidSourceForRender } from "./mermaid-security";
+describe("local Mermaid boundary", () => {
+  it("preserves compiled static charts", () => {
+    const source = 'flowchart TD\n n_a["App"] --> n_b[("Database")]';
     expect(sanitizeMermaidSourceForRender(source)).toBe(source);
   });
-});
-
-describe("enforceSafeMermaidLinks", () => {
-  it("keeps only HTTPS GitHub links", () => {
+  it("allows URL-like plain labels from the compiler", () => {
+    const graph = structuredClone(SAMPLE_REPORT.graph);
+    graph.nodes[0]!.label = 'https://example.test/API "client"';
+    graph.nodes[1]!.label = "data: is a source label";
+    graph.edges[0]!.label = "javascript: shown as inert text";
+    const source = compileDiagramGraph({ graph });
+    expect(source).toContain("&quot;");
+    expect(sanitizeMermaidSourceForRender(source)).toBe(source);
+    expect(source).not.toMatch(/^\s*click\b/m);
+  });
+  it.each(['click n_a "https://github.com/x/y"', "click\nn_a callback", '%%{init: {securityLevel: "loose"}}%%', 'n_a["<img src=x>"]', 'n_a@{img: "x"}', 'style n_a fill:url("https://evil.test/x")', 'linkStyle 0 stroke:red', '---\nconfig:\n  securityLevel: loose', 'classDef malicious fill:url("https://evil.test/x")'])('rejects interactions or unsafe syntax: %s', (directive) => {
+    expect(() => sanitizeMermaidSourceForRender(`flowchart TD\n${directive}`)).toThrow();
+  });
+  it("removes links, embedded resources, external styles, and event handlers", () => {
     const root = document.createElement("div");
-    root.innerHTML = [
-      '<a id="safe" href="https://github.com/acme/demo">safe</a>',
-      '<a id="unsafe" href="https://example.com/phish">unsafe</a>',
-    ].join("");
-
+    root.innerHTML = '<svg><a href="https://example.com">link</a><image href="https://example.com/a"/><foreignObject>html</foreignObject><style>@import "https://example.com";</style><path id="safe" marker-end="url(#marker)" onload="evil()" style="fill:url(https://example.com)"/></svg>';
     enforceSafeMermaidLinks(root);
-
-    expect(root.querySelector("#safe")?.getAttribute("href")).toBe(
-      "https://github.com/acme/demo",
-    );
-    expect(root.querySelector("#safe")?.getAttribute("rel")).toBe(
-      "noopener noreferrer",
-    );
-    expect(root.querySelector("#unsafe")?.hasAttribute("href")).toBe(false);
+    expect(root.querySelector("a,image,foreignObject,style")).toBeNull();
+    expect(root.querySelector("path")?.hasAttribute("onload")).toBe(false);
+    expect(root.querySelector("path")?.hasAttribute("style")).toBe(false);
+    expect(root.querySelector("path")?.getAttribute("marker-end")).toBe("url(#marker)");
   });
 });
