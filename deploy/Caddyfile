@@ -1,0 +1,28 @@
+# Import this site block into an existing Caddyfile. Adjust the root to the
+# built out/ directory, never the repository root. No access log is enabled.
+http://gitdiagram.localhost {
+	root * /srv/gitdiagram/out
+
+	header {
+		Content-Security-Policy "default-src 'none'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'none'; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options DENY
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		Cache-Control no-store
+	}
+
+	@outside not remote_ip 127.0.0.1 ::1
+	respond @outside 403
+
+	@write not method GET HEAD
+	header @write Allow "GET, HEAD"
+	respond @write 405
+
+	@hidden path_regexp hidden (^|/)\.
+	respond @hidden 404
+
+	file_server {
+		index index.html
+	}
+}

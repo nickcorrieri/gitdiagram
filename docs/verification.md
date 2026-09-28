@@ -22,3 +22,7 @@ The first probe caught Zod checking whether dynamic `Function` generation was al
 ## Limits
 
 This is evidence for the listed workflows and exact locked build, not a whole-machine packet capture, complete dependency source/binary audit, or verification of every possible input. Build-time network behavior and arbitrary operator proxies/extensions were not measured. The production policy denies browser network connections and external resources; operators must preserve those headers when using a different static host.
+
+## Caddy hosting
+
+On 2026-09-28, the supplied Caddy site block and the combined local server configuration passed `caddy validate`. The local server was reloaded to serve the existing static export at `http://gitdiagram.localhost`. Terminal HTTP checks confirmed the page and a JavaScript asset return 200, all six production security headers match `scripts/http-policy.mjs`, HEAD works, POST returns 405, and requests for source files, hidden files, an API path and parent traversal return 404. The existing `mt.localhost` site still returned 200. The exported tree contained no symlinks. No browser interaction was used for these hosting checks; rejection of remote clients was configured but not tested from another machine.
