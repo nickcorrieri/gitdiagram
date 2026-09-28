@@ -1,2 +1,4 @@
 import ReportViewer from "~/components/report-viewer";
-export default function HomePage() { return <ReportViewer />; }
+export default function HomePage() {
+  return <ReportViewer />;
+}

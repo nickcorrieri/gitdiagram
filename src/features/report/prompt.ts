@@ -6,27 +6,80 @@ export const REPORT_SCHEMA = z.toJSONSchema(architectureReportSchema);
 export const SAMPLE_REPORT: ArchitectureReport = {
   version: 1,
   repository: { name: "Example local application", revision: null },
-  explanation: "The browser presents a local interface. The storage module saves preferences in browser storage. This example demonstrates a report format, not an inspected repository.",
+  explanation:
+    "The browser presents a local interface. The storage module saves preferences in browser storage. This example demonstrates a report format, not an inspected repository.",
   fileTree: ["src/app.ts", "src/storage.ts"],
   graph: {
-    groups: [{ id: "application", label: "Local application", description: null }],
-    nodes: [
-      { id: "interface", label: "Browser interface", type: "UI", description: "Presents the application.", groupId: "application", path: "src/app.ts", shape: "box" },
-      { id: "storage", label: "Preferences", type: "Browser storage", description: "Stores preferences locally.", groupId: "application", path: "src/storage.ts", shape: "database" },
+    groups: [
+      { id: "application", label: "Local application", description: null },
     ],
-    edges: [{ from: "interface", to: "storage", label: "Saves preferences", description: null, style: "solid" }],
+    nodes: [
+      {
+        id: "interface",
+        label: "Browser interface",
+        type: "UI",
+        description: "Presents the application.",
+        groupId: "application",
+        path: "src/app.ts",
+        shape: "box",
+      },
+      {
+        id: "storage",
+        label: "Preferences",
+        type: "Browser storage",
+        description: "Stores preferences locally.",
+        groupId: "application",
+        path: "src/storage.ts",
+        shape: "database",
+      },
+    ],
+    edges: [
+      {
+        from: "interface",
+        to: "storage",
+        label: "Saves preferences",
+        description: null,
+        style: "solid",
+      },
+    ],
   },
-  evidence: [{ from: "interface", to: "storage", paths: ["src/app.ts", "src/storage.ts"], note: "Illustrative relationship only; replace with source evidence from your repository.", confidence: "inferred" }],
-  uncertainties: ["This sample is illustrative and has not been verified against a repository."],
+  evidence: [
+    {
+      from: "interface",
+      to: "storage",
+      paths: ["src/app.ts", "src/storage.ts"],
+      note: "Illustrative relationship only; replace with source evidence from your repository.",
+      confidence: "inferred",
+    },
+  ],
+  uncertainties: [
+    "This sample is illustrative and has not been verified against a repository.",
+  ],
 };
 export const REPORT_TEMPLATE: ArchitectureReport = {
   version: 1,
   repository: { name: "Replace with repository name", revision: null },
   explanation: "Replace with an evidence based architecture explanation.",
   fileTree: [],
-  graph: { groups: [], nodes: [{ id: "application", label: "Application", type: "Application", description: null, groupId: null, path: null, shape: "box" }], edges: [] },
+  graph: {
+    groups: [],
+    nodes: [
+      {
+        id: "application",
+        label: "Application",
+        type: "Application",
+        description: null,
+        groupId: null,
+        path: null,
+        shape: "box",
+      },
+    ],
+    edges: [],
+  },
   evidence: [],
-  uncertainties: ["Replace this template with findings from a read only source review."],
+  uncertainties: [
+    "Replace this template with findings from a read only source review.",
+  ],
 };
 export const REPORT_PROMPT = `Review the repository I explicitly provide and produce a local architecture report for GitDiagram.
 Use the owner selected coding assistant, GUI application or local model already configured for this repository. The viewer does not require or endorse a particular tool, AI account or API integration.

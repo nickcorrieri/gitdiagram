@@ -23,18 +23,31 @@ after(async () => {
 });
 function get(path, method = "GET") {
   return new Promise((done, fail) => {
-    const request = httpRequest({ host: "127.0.0.1", port, path, method }, (response) => {
-      let body = "";
-      response.setEncoding("utf8");
-      response.on("data", (part) => { body += part; });
-      response.on("end", () => done({ status: response.statusCode, headers: response.headers, body }));
-    });
-    request.on("error", fail); request.end();
+    const request = httpRequest(
+      { host: "127.0.0.1", port, path, method },
+      (response) => {
+        let body = "";
+        response.setEncoding("utf8");
+        response.on("data", (part) => {
+          body += part;
+        });
+        response.on("end", () =>
+          done({
+            status: response.statusCode,
+            headers: response.headers,
+            body,
+          }),
+        );
+      },
+    );
+    request.on("error", fail);
+    request.end();
   });
 }
 test("serves static files with network-denying browser policy", async () => {
   const result = await get("/");
-  assert.equal(result.status, 200); assert.equal(result.body, "local viewer");
+  assert.equal(result.status, 200);
+  assert.equal(result.body, "local viewer");
   assert.match(result.headers["content-security-policy"], /connect-src 'none'/);
   assert.match(result.headers["content-security-policy"], /form-action 'none'/);
   assert.equal(result.headers["referrer-policy"], "no-referrer");
@@ -42,12 +55,20 @@ test("serves static files with network-denying browser policy", async () => {
 test("rejects uploads, API mutations, traversal and external symlinks", async () => {
   assert.equal((await get("/api/report", "POST")).status, 405);
   assert.equal((await get("/api/report")).status, 404);
-  for (const path of ["/../secret", "/%2e%2e/secret", "/.env", "/%00", "/%5csecret", "/%ZZ"]) {
+  for (const path of [
+    "/../secret",
+    "/%2e%2e/secret",
+    "/.env",
+    "/%00",
+    "/%5csecret",
+    "/%ZZ",
+  ]) {
     assert.equal((await get(path)).status, path === "/%ZZ" ? 404 : 400);
   }
   assert.equal((await get("/leak")).status, 404);
 });
 test("HEAD does not return content", async () => {
   const result = await get("/", "HEAD");
-  assert.equal(result.status, 200); assert.equal(result.body, "");
+  assert.equal(result.status, 200);
+  assert.equal(result.body, "");
 });

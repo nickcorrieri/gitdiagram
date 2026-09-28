@@ -1,6 +1,6 @@
 # GitDiagram outbound-data and backdoor review
 
-> Historical review of the upstream commit named below. It describes source paths and behavior removed from this local fork; see [README.local.md](README.local.md) and [docs/privacy.md](docs/privacy.md) for the fork's current design. The fork has not yet had an installed-dependency or runtime egress review.
+> Historical review of the upstream commit named below. It describes source paths and behavior removed from this local fork; see [README.local.md](README.local.md) and [docs/privacy.md](docs/privacy.md) for the fork's current design, and [verification results](docs/verification.md) for the completed local checks and their limits.
 
 Reviewed 2026-09-27 at commit `abe0620f1ff33c1d962e5e8cc6dc74e66c8090cf`.
 

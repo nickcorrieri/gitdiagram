@@ -4,6 +4,9 @@ const config = [
   ...nextCoreVitals,
   ...nextTypescript,
   { ignores: [".next/**", "out/**", "node_modules/**", "next-env.d.ts"] },
-  { settings: { react: { version: "19.3" } }, rules: { "react-hooks/set-state-in-effect": "off" } },
+  {
+    settings: { react: { version: "19.3" } },
+    rules: { "react-hooks/set-state-in-effect": "off" },
+  },
 ];
 export default config;

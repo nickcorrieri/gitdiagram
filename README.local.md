@@ -15,7 +15,13 @@ The app does not read your repository, call an AI provider, accept GitHub creden
 
 Use Node.js 22.23 or newer and the existing npm supplied with Node. Installing dependencies requires the operator's approval; no package installation is implied by these instructions.
 
-With dependencies already installed:
+After approving the dependencies listed in [DEPENDENCIES.md](DEPENDENCIES.md), install the locked tree with lifecycle scripts disabled:
+
+```sh
+npm ci --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+```
+
+With dependencies installed:
 
 ```sh
 npm run dev
@@ -30,9 +36,9 @@ npm run start
 
 The production server runs `scripts/serve.mjs`, serving `out/` on `127.0.0.1:3000` by default. See [setup](docs/dev-setup.md) for LAN access and hosting details.
 
-Next.js build/development telemetry is disabled through `NEXT_TELEMETRY_DISABLED=1`. Application source intends no outbound data communication. Dependency behavior and runtime egress must still be verified for the exact build you use; this README is not a claim that that verification has already passed.
+Next.js build/development telemetry is disabled through `NEXT_TELEMETRY_DISABLED=1`. The listed local checks and browser workflows passed; see [verification results](docs/verification.md) for the evidence and its limits. Preserve the production browser policy when using another static host.
 
-See [architecture](docs/architecture.md), [privacy](docs/privacy.md) and [security reporting](SECURITY.md).
+See [architecture](docs/architecture.md), [privacy](docs/privacy.md), [verification results](docs/verification.md) and [security reporting](SECURITY.md).
 
 ## Contributions and attribution
 

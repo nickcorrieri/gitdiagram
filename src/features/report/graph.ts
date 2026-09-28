@@ -1,5 +1,12 @@
-import type { DiagramGraph, DiagramGraphEdge, DiagramGraphNode } from "~/features/diagram/graph";
-import { diagramGraphSchema, normalizeDiagramText } from "~/features/diagram/graph";
+import type {
+  DiagramGraph,
+  DiagramGraphEdge,
+  DiagramGraphNode,
+} from "~/features/diagram/graph";
+import {
+  diagramGraphSchema,
+  normalizeDiagramText,
+} from "~/features/diagram/graph";
 
 function escapeMermaidText(value: string): string {
   const escaped = normalizeDiagramText(value)

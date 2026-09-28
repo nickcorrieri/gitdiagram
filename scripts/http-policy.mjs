@@ -9,15 +9,22 @@ export function browserHeaders(development = false) {
     "img-src 'self' blob: data:",
     "font-src 'self'",
     `connect-src ${development ? "'self'" : "'none'"}`,
-    "worker-src 'none'", "frame-src 'none'", "object-src 'none'",
-    "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'",
+    "worker-src 'none'",
+    "frame-src 'none'",
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
   ].join("; ");
   return [
     { key: "Content-Security-Policy", value: policy },
     { key: "X-Content-Type-Options", value: "nosniff" },
     { key: "Referrer-Policy", value: "no-referrer" },
     { key: "X-Frame-Options", value: "DENY" },
-    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+    {
+      key: "Permissions-Policy",
+      value: "camera=(), microphone=(), geolocation=(), payment=()",
+    },
     { key: "Cache-Control", value: "no-store" },
   ];
 }

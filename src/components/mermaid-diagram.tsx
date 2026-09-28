@@ -114,7 +114,6 @@ const MermaidChart = ({
         secondaryColor: "#f0f0f0",
         tertiaryColor: "#f7f7f7",
       },
-
     };
 
     const renderDiagram = async () => {
@@ -144,7 +143,15 @@ const MermaidChart = ({
         const sanitized = document.createElement("div");
         sanitized.innerHTML = DOMPurify.sanitize(svg, {
           USE_PROFILES: { svg: true, svgFilters: true },
-          FORBID_TAGS: ["script", "foreignObject", "image", "a", "iframe", "animate", "set"],
+          FORBID_TAGS: [
+            "script",
+            "foreignObject",
+            "image",
+            "a",
+            "iframe",
+            "animate",
+            "set",
+          ],
           FORBID_ATTR: ["href", "xlink:href"],
         });
         enforceSafeMermaidLinks(sanitized);
@@ -184,18 +191,41 @@ const MermaidChart = ({
   ]);
 
   return (
-    <div ref={containerRef} className={`diagram-shell ${containerClassName ?? ""}`}>
-      {renderMessage && <p role="alert" className="error">{renderMessage}</p>}
-      <div ref={interactionLayerRef}
+    <div
+      ref={containerRef}
+      className={`diagram-shell ${containerClassName ?? ""}`}
+    >
+      {renderMessage && (
+        <p role="alert" className="error">
+          {renderMessage}
+        </p>
+      )}
+      <div
+        ref={interactionLayerRef}
         {...(zoomingEnabled ? INTERACTIVE_VIEWER_PROPS : {})}
-        onKeyDown={handleKeyDown} className="diagram-interaction"
-        onClickCapture={handleClickCapture} onDragStart={handleDragStart}
-        onLostPointerCapture={handleLostPointerCapture} onPointerCancel={handlePointerCancel}
-        onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-        {zoomingEnabled && <MermaidDiagramToolbar formattedZoom={formattedZoom}
-          isPanZoomReady={isPanZoomReady} onFit={() => fitDiagram(true)}
-          onZoomIn={() => stepZoom(1.18)} onZoomOut={() => stepZoom(1 / 1.18)} />}
-        <div ref={diagramRef} className={`mermaid ${!isPanZoomReady ? "pending" : ""} ${diagramClassName ?? ""}`} />
+        onKeyDown={handleKeyDown}
+        className="diagram-interaction"
+        onClickCapture={handleClickCapture}
+        onDragStart={handleDragStart}
+        onLostPointerCapture={handleLostPointerCapture}
+        onPointerCancel={handlePointerCancel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        {zoomingEnabled && (
+          <MermaidDiagramToolbar
+            formattedZoom={formattedZoom}
+            isPanZoomReady={isPanZoomReady}
+            onFit={() => fitDiagram(true)}
+            onZoomIn={() => stepZoom(1.18)}
+            onZoomOut={() => stepZoom(1 / 1.18)}
+          />
+        )}
+        <div
+          ref={diagramRef}
+          className={`mermaid ${!isPanZoomReady ? "pending" : ""} ${diagramClassName ?? ""}`}
+        />
       </div>
     </div>
   );

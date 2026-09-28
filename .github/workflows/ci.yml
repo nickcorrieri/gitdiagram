@@ -24,6 +24,7 @@ jobs:
       - name: Validate source, types, tests and static export
         run: |
           npm run check
+          npm run format:check
           npm run build
       - name: Dependency advisory scan
         run: npm audit --audit-level=high
