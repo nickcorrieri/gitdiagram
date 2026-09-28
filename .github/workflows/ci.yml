@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - codex/local-private-viewer
 
 permissions:
   contents: read
