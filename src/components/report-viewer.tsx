@@ -205,18 +205,22 @@ export default function ReportViewer() {
               }}
             />
           </label>
-          <button
-            className="text-button"
-            onClick={() => importText(json(SAMPLE_REPORT))}
-          >
-            Explore a sample
-          </button>
-          <button
-            className="text-button"
-            onClick={() => download(json(SAMPLE_REPORT), "sample-report.json")}
-          >
-            Download sample
-          </button>
+          <div className="actions">
+            <button
+              className="text-button"
+              onClick={() => importText(json(SAMPLE_REPORT))}
+            >
+              Explore a sample
+            </button>
+            <button
+              className="text-button"
+              onClick={() =>
+                download(json(SAMPLE_REPORT), "sample-report.json")
+              }
+            >
+              Download sample
+            </button>
+          </div>
           <details>
             <summary>Paste JSON instead</summary>
             <textarea
