@@ -26,3 +26,9 @@ This is evidence for the listed workflows and exact locked build, not a whole-ma
 ## Caddy hosting
 
 On 2026-09-28, the supplied Caddy site block and the combined local server configuration passed `caddy validate`. The local server was reloaded to serve the existing static export at `http://gitdiagram.localhost`. Terminal HTTP checks confirmed the page and a JavaScript asset return 200, all six production security headers match `scripts/http-policy.mjs`, HEAD works, POST returns 405, and requests for source files, hidden files, an API path and parent traversal return 404. The existing `mt.localhost` site still returned 200. The exported tree contained no symlinks. No browser interaction was used for these hosting checks; rejection of remote clients was configured but not tested from another machine.
+
+## Original design restoration
+
+On 2026-09-28, the entry page was compared with the original source and README screenshot. The original hero, lavender panel, black borders and offset shadows were restored around the local import workflow. Geist is served from a local font copied from the existing Next.js package, with its OFL notice preserved. No dependencies or external integrations were added.
+
+The full local checks (66 app tests and three server tests) and static build passed after the changes. A separate headless browser, using the existing installed tooling, checked the rebuilt page at 320, 390, 768, 1024, 1440 and 1920 pixels. Neither the page nor the import card overflowed horizontally. Desktop and phone screenshots were inspected. The user's browser was not operated. The existing metadata warning remains nonfatal.

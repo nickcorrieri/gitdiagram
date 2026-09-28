@@ -135,56 +135,37 @@ export default function ReportViewer() {
   return (
     <main className="app-shell">
       <header className="hero">
-        <span className="eyebrow">YOUR REPOSITORY. YOUR MACHINE.</span>
         <Hero />
         <p>
-          Bring a report from your own coding assistant. Explore the
-          architecture here, on your self hosted machine or private network.
+          Turn your repository report into an interactive architecture diagram.
         </p>
-        <span className="local-badge">● Local report viewer</span>
+        <p className="hero-caption">
+          Your tools prepare it. Everything here stays on your machine.
+        </p>
       </header>
-      <section className="workflow" aria-label="Report workflow">
-        <div className="step">
-          <span className="step-number">01</span>
-          <h2>Prepare a report</h2>
-          <p>
-            Give your chosen tool the prompt and template. You decide which
-            model runs and where it runs.
-          </p>
-          <div className="actions">
-            <button
-              onClick={() =>
-                download(REPORT_PROMPT, "architecture-prompt.txt", "text/plain")
-              }
-            >
-              Download prompt
-            </button>
-            <button
-              onClick={() =>
-                download(json(REPORT_TEMPLATE), "report-template.json")
-              }
-            >
-              Template
-            </button>
-            <button
-              onClick={() =>
-                download(json(REPORT_SCHEMA), "report-schema.json")
-              }
-            >
-              Schema
-            </button>
-          </div>
-        </div>
-        <div className="step">
-          <span className="step-number">02</span>
-          <h2>Bring it here</h2>
-          <p>
-            Import the completed JSON file. Reports stay in this browser unless
-            you download them.
-          </p>
-          <label className="file-button">
-            Import report
+      <section className="workflow neo-panel" aria-label="Report workflow">
+        <div className="step import-step">
+          <label className="report-import">
+            <span className="report-file-slot neo-input">
+              <svg
+                className="import-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+                <path d="M14 2v6h6M8 13h8M8 17h5" />
+              </svg>
+              <span className="import-copy">
+                <strong>Choose a JSON report</strong>
+                <span>From your own coding tools</span>
+              </span>
+            </span>
+            <span className="import-cta neo-button">
+              Import report <span aria-hidden="true">→</span>
+            </span>
             <input
+              aria-label="Import report"
               type="file"
               accept=".json,application/json"
               onChange={async (event) => {
@@ -205,9 +186,10 @@ export default function ReportViewer() {
               }}
             />
           </label>
-          <div className="actions">
+          <div className="sample-actions">
+            <span>Try it first:</span>
             <button
-              className="text-button"
+              className="neo-button sample-button"
               onClick={() => importText(json(SAMPLE_REPORT))}
             >
               Explore a sample
@@ -221,7 +203,7 @@ export default function ReportViewer() {
               Download sample
             </button>
           </div>
-          <details>
+          <details className="paste-details">
             <summary>Paste JSON instead</summary>
             <textarea
               aria-label="Report JSON"
@@ -229,11 +211,63 @@ export default function ReportViewer() {
               maxLength={MAX_REPORT_BYTES}
               onChange={(event) => setPaste(event.target.value)}
             />
-            <button onClick={() => importText(paste)}>
+            <button className="neo-button" onClick={() => importText(paste)}>
               Import pasted JSON
             </button>
           </details>
         </div>
+        <div className="step prepare-step">
+          <div className="prepare-copy">
+            <h2>Need a report?</h2>
+            <p>Give your coding assistant the prompt and template.</p>
+          </div>
+          <div className="actions">
+            <button
+              className="neo-button-muted"
+              onClick={() =>
+                download(REPORT_PROMPT, "architecture-prompt.txt", "text/plain")
+              }
+            >
+              Download prompt
+            </button>
+            <button
+              className="neo-button-muted"
+              onClick={() =>
+                download(json(REPORT_TEMPLATE), "report-template.json")
+              }
+            >
+              Template
+            </button>
+            <button
+              className="neo-button-muted"
+              onClick={() =>
+                download(json(REPORT_SCHEMA), "report-schema.json")
+              }
+            >
+              Schema
+            </button>
+          </div>
+        </div>
+        <svg
+          className="card-sparkle"
+          viewBox="0 0 100 100"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="m39 9 10 28 30 4-25 17 4 31-21-22-29 10 14-27L9 30l29 8Z"
+            fill="#38bdf8"
+            stroke="black"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M82 10v14M75 17h14M12 85v10M7 90h10"
+            stroke="black"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
       </section>
       <div className="storage-controls">
         <label>
@@ -384,15 +418,7 @@ export default function ReportViewer() {
             )}
           </div>
         </section>
-      ) : (
-        <section className="empty-state">
-          <span className="empty-graphic" aria-hidden="true">
-            ▢ ── ▢ ── ▢
-          </span>
-          <h2>A clear view starts with a report.</h2>
-          <p>Import your architecture report or explore the sample above.</p>
-        </section>
-      )}
+      ) : null}
     </main>
   );
 }

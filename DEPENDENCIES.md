@@ -20,6 +20,8 @@ Generated from `package-lock.json`. The approved dependencies were installed loc
 
 ## Direct packages
 
+The original Geist typography is restored using a local copy of the Latin font already bundled with the approved Next.js package. No font package was installed and no remote font service is used. The font and its SIL Open Font License are preserved in `public/fonts/`; see [NOTICE](NOTICE).
+
 | Package                     | Version range | Why included                                               |
 | --------------------------- | ------------- | ---------------------------------------------------------- |
 | `@tailwindcss/postcss`      | `4.3.3`       | Compile original Tailwind CSS at build time                |

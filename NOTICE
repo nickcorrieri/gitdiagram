@@ -12,3 +12,8 @@ by the original author.
 Third-party packages and assets retain their respective licenses and notices.
 The project's MIT license does not establish that every dependency is MIT-licensed.
 Review and preserve applicable third-party notices when distributing a build.
+
+Geist font: Copyright 2024 The Geist Project Authors.
+The locally served Latin font is copied from the approved Next.js package.
+It is distributed under the SIL Open Font License 1.1, preserved in
+public/fonts/OFL.txt. It makes no external font requests.
